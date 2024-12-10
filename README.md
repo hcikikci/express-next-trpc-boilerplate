@@ -1,6 +1,6 @@
 # Express & Next.js Full-Stack Boilerplate with tRPC, Prisma, and PostgreSQL
 
-A modern, not :) production-ready (but development-ready) full-stack boilerplate built with Next.js 15+, tRPC, Prisma, PostgreSQL, and Express.js. This template provides everything you need to start building your application with best practices and a powerful tech stack.
+A modern, development-ready (not production-ready yet :) ) full-stack boilerplate built with Next.js 15+, tRPC, Prisma, PostgreSQL, and Express.js. This template provides everything you need to start building your application with best practices and a powerful tech stack.
 
 ## 🚀 Features
 
