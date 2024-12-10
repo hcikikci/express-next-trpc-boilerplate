@@ -1,0 +1,74 @@
+version: "3.8"
+
+x-common-env: &common-env
+  DATABASE_URL: postgresql://postgres:postgres@db:5432/express-next-trpc-boilerplate?schema=public
+  FRONTEND_URL: http://localhost:3000
+  SESSION_SECRET: your-session-secret
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  SESSION_NAME: express-next-trpc-boilerplate
+  NODE_ENV: development
+  PORT: 4000
+  CHOKIDAR_USEPOLLING: true
+
+x-backend: &backend
+  build:
+    context: ./
+    dockerfile: backend/dev.Dockerfile
+  volumes:
+    - ./backend:/app/backend
+  environment:
+    <<: *common-env
+
+services:
+  backend:
+    <<: *backend
+    ports:
+      - "4000:4000"
+      - "9229:9229"
+    depends_on:
+      - db
+    command: >
+      sh -c "
+      npm run dev
+      "
+
+  event-worker:
+    <<: *backend
+    depends_on:
+      - backend
+    command: >
+      sh -c "
+      npm run start-event-worker
+      "
+
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: express-next-trpc-boilerplate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  postgres_data:
+  node_modules:

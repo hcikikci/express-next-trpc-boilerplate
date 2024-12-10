@@ -1,0 +1,5 @@
+# Backend specific ignores
+backend/uploads
+backend/.env
+backend/*Dockerfile*
+backend/node_modules
