@@ -25,6 +25,7 @@
     "@socket.io/redis-adapter": "^8.3.0",
     "@trpc/client": "^11.0.0-rc.660",
     "@trpc/server": "^11.0.0-rc.660",
+    "@types/winston": "^2.4.4",
     "bcryptjs": "^2.4.3",
     "connect-redis": "^7.1.1",
     "cors": "^2.8.5",
@@ -39,6 +40,7 @@
     "nodemailer": "^6.9.16",
     "path": "^0.12.7",
     "socket.io": "^4.8.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

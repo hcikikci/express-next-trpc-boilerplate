@@ -4,3 +4,4 @@ prisma/migrations
 uploads/
 dist/
 coverage/
+logs/
