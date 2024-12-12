@@ -1,8 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { seedTodos } from './todoSeeder';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  await seedTodos(prisma);
   console.log('Seeding completed.');
 }
 

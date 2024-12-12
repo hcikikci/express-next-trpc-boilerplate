@@ -1,5 +1,7 @@
 import { BaseRepository } from '../repository/base.repository';
 import { Args } from '@prisma/client/runtime/library';
+import { PaginatedResult, PaginationParams } from '../types/pagination.types';
+import { calculatePagination } from '../utils/pagination.utils';
 
 export class BaseService<
   T,
@@ -13,28 +15,29 @@ export class BaseService<
   }
 
   async getAll(
-    page: number = 1,
-    pageSize: number = 10,
+    paginationParams: Required<PaginationParams>,
     filters: W = {} as W,
     orderBy: S = {} as S,
-  ): Promise<{ items: T[]; count: number }> {
+  ): Promise<PaginatedResult<T>> {
     try {
-      if (page < 1) {
-        page = 1;
-      }
+      // Get total count first
+      const total = await this.repository?.count({ where: filters });
 
-      const skip = (page - 1) * pageSize;
-      const [items, count] = await Promise.all([
-        this.repository?.findMany({
-          where: filters,
-          skip,
-          take: pageSize,
-          orderBy,
-        }),
-        this.repository?.count({ where: filters }),
-      ]);
+      // Calculate pagination
+      const { skip, take, metadata } = calculatePagination(total, paginationParams);
 
-      return { items, count };
+      // Get items for the current page
+      const items = await this.repository?.findMany({
+        where: filters,
+        skip,
+        take,
+        orderBy,
+      });
+
+      return {
+        items: items || [],
+        metadata,
+      };
     } catch (error) {
       throw error;
     }

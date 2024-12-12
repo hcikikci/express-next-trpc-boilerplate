@@ -3,17 +3,29 @@ import { router, procedure } from '../../core/server/trpc';
 import { TodoService } from './todo.service';
 import { TodoRepository } from './todo.repository';
 import { Request } from 'express';
-import { FilterOptions, parseFilters } from '@core/base/api/parseFilters';
+import { QueryOptions, parseQuery } from '@core/base/api/parseFilters';
 import { TodoStatus } from '@prisma/client';
 
 const todoService = new TodoService(new TodoRepository());
 
+const todoQueryOptions: QueryOptions = {
+  searchableFields: ['title', 'description'],
+  sortOptions: {
+    defaultField: 'createdAt',
+    defaultOrder: 'desc',
+  },
+  paginationOptions: {
+    defaultPageSize: 5,
+    maxPageSize: 100,
+  },
+};
+
 export const todoRouter = router({
   getAllTodos: procedure.query(async ({ ctx }) => {
     const req = ctx.req as Request;
-    const searchableFields: FilterOptions['searchableFields'] = ['title', 'description', 'status'];
-    const { where, orderBy, skip, take } = parseFilters(req, { searchableFields });
-    return todoService.getAll(skip, take, where, orderBy);
+    const { filters, sort, pagination } = parseQuery(req, todoQueryOptions);
+    const { page, pageSize } = pagination;
+    return todoService.getAll({ page, pageSize }, filters, sort);
   }),
 
   getById: procedure.input(z.number()).query(async ({ input }) => {
