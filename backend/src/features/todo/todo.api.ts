@@ -21,12 +21,24 @@ const todoQueryOptions: QueryOptions = {
 };
 
 export const todoRouter = router({
-  getAllTodos: procedure.query(async ({ ctx }) => {
-    const req = ctx.req as Request;
-    const { filters, sort, pagination } = parseQuery(req, todoQueryOptions);
-    const { page, pageSize } = pagination;
-    return todoService.getAll({ page, pageSize }, filters, sort);
-  }),
+  getAllTodos: procedure
+    .input(
+      z.object({
+        search: z.string().optional(),
+        filter: z.string().optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(['asc', 'desc']).optional(),
+        page: z.number().optional(),
+        pageSize: z.number().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const req = ctx.req as Request;
+      Object.assign(req.query, input);
+      const { filters, sort, pagination } = parseQuery(req, todoQueryOptions);
+      const { page, pageSize } = pagination;
+      return todoService.getAll({ page, pageSize }, filters, sort);
+    }),
 
   getById: procedure.input(z.number()).query(async ({ input }) => {
     return todoService.getById(input);
